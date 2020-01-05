@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from flask_mysqldb import MySQL
 
 app = Flask(__name__)
 
@@ -13,6 +14,10 @@ def login():
 @app.route("/login_new")
 def login_new():
     return render_template("login_new.html")
+
+@app.route("/add_exercise")
+def add_exercise():
+    return render_template("add_exercise.html")
 
 @app.route("/profile")
 def profile():
