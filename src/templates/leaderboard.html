@@ -1,0 +1,8 @@
+{% extends "template.html" %}
+{% block content %}
+<ul>
+{% for item in doc_list %}
+        <li>{{ item }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
