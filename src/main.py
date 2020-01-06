@@ -12,11 +12,8 @@ firebase_admin.initialize_app(cred, {
 
 db = firestore.client()
 
-users_ref = db.collection(u'users')
+users_ref = db.collection(u'exercise')
 docs = users_ref.stream()
-
-for doc in docs:
-    print(u'{} => {}'.format(doc.id, doc.to_dict()))
 
 app = Flask(__name__)
 
