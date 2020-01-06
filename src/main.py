@@ -34,9 +34,9 @@ def login_new():
 
 @app.route("/add_exercise")
 def add_exercise():
-	doc_list = []
-	for doc in docs:
-    	doc_list.append(doc.to_dict())
+    doc_list = []
+    for doc in docs:
+        doc_list.append(doc.to_dict())
     return render_template("add_exercise.html", doc_list=doc_list)
 
 @app.route("/profile")
