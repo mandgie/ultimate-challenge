@@ -12,6 +12,12 @@ firebase_admin.initialize_app(cred, {
 
 db = firestore.client()
 
+users_ref = db.collection(u'users')
+docs = users_ref.stream()
+
+for doc in docs:
+    print(u'{} => {}'.format(doc.id, doc.to_dict()))
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -28,7 +34,10 @@ def login_new():
 
 @app.route("/add_exercise")
 def add_exercise():
-    return render_template("add_exercise.html")
+	doc_list = []
+	for doc in docs:
+    	doc_list.append(doc.to_dict())
+    return render_template("add_exercise.html", doc_list=doc_list)
 
 @app.route("/profile")
 def profile():
