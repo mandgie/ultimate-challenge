@@ -1,4 +1,16 @@
 from flask import Flask, render_template
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+
+# Use the application default credentials
+project_id = 'ultimate-challenge'
+cred = credentials.ApplicationDefault()
+firebase_admin.initialize_app(cred, {
+  'projectId': project_id,
+})
+
+db = firestore.client()
 
 app = Flask(__name__)
 
