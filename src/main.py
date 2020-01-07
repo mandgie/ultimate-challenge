@@ -18,6 +18,7 @@ def home():
 
 @app.route("/leaderboard")
 def leaderboard():
+    # Connect to firebase client
     db = firestore.client()
     users_ref = db.collection(u'exercise')
     docs = users_ref.stream()
@@ -31,10 +32,6 @@ def leaderboard():
 def login():
     return render_template("login.html")
 
-@app.route("/login_new")
-def login_new():
-    return render_template("login_new.html")
-
 @app.route("/add_exercise", methods=['GET', 'POST'])
 def add_exercise():
     if request.method == 'POST':
@@ -42,12 +39,24 @@ def add_exercise():
         athlete_name = request.form.get("athlete_name")
         activity_name = request.form.get("activity_name")
         activity_length = request.form.get("activity_length")
+
+        db = firestore.client()
+
+        data = {
+            u'date': date_value,
+            u'name': athlete_name,
+            u'activity': activity_name,
+            u'length_of_activity': activity_length}
+
+        # Add a new doc in collection 'cities' with ID 'LA'
+        db.collection(u'exercise').document().set(data)
     return render_template("add_exercise.html")
 
-@app.route("/profile")
-def profile():
-    return render_template("profile.html")
-    
+@app.route("/stats")
+def stats():
+    return render_template("stats.html")
+
+
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This

@@ -1,8 +1,14 @@
 {% extends "template.html" %}
 {% block content %}
-<ul>
-{% for item in doc_list %}
-        <li>{{ item }}</li>
-    {% endfor %}
-</ul>
+<div class="container">
+	{% for item in doc_list %}
+	<div class="alert alert-success" role="alert">
+  		<h4 class="alert-heading">{{ item['name'] }}</h4>
+  		<p class="mb-0">Daturm: {{ item['date'] }}</p>
+  		<p class="mb-0">Aktivitet: {{ item['activity'] }}</p>
+  		<p class="mb-0">Antal minuter:: {{ item['length_of_activity'] }}</p>
+	</div>
+	{% endfor %}
+</div>
+
 {% endblock %}
