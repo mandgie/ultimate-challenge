@@ -2,6 +2,9 @@ from flask import Flask, render_template, request
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from datetime import date
+
+today = date.today()
 
 # Use the application default credentials
 project_id = 'ultimate-challenge'
@@ -9,6 +12,23 @@ cred = credentials.ApplicationDefault()
 firebase_admin.initialize_app(cred, {
   'projectId': project_id,
 })
+
+point_system = {
+    'Bollsport': 12.7,
+    'Cirkelträning': 12.0,
+    'CrossFit': 13.0,
+    'Cykling': 13.5,
+    'Gym': 11.5,
+    'Kampsport': 13.7,
+    'Löpning': 13.9,
+    'Racketsport': 12.2,
+    'Simning': 10.1,
+    'Yoga': 9.0,
+    'Övrigt': 10.0}
+
+point_counter = [nr for nr in range(30, 185, 5)]
+
+
 
 app = Flask(__name__)
 
@@ -26,11 +46,12 @@ def leaderboard():
     doc_list = []
     for doc in docs:
         doc_list.append(doc.to_dict())
+    point_counter = [nr for nr in range(30, 185, 5)]
     return render_template("leaderboard.html", doc_list=doc_list)
 
-@app.route("/login")
-def login():
-    return render_template("login.html")
+@app.route("/signup")
+def signup():
+    return render_template("signup.html")
 
 @app.route("/add_exercise", methods=['GET', 'POST'])
 def add_exercise():
@@ -50,7 +71,7 @@ def add_exercise():
 
         # Add a new doc in collection 'cities' with ID 'LA'
         db.collection(u'exercise').document().set(data)
-    return render_template("add_exercise.html")
+    return render_template("add_exercise.html", activities=point_system, point_counter=point_counter, today=today)
 
 @app.route("/stats")
 def stats():
