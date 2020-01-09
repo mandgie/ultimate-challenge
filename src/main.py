@@ -42,15 +42,30 @@ def leaderboard():
     db = firestore.client()
     users_ref = db.collection(u'exercise')
     docs = users_ref.stream()
-    print('Hello world')
     doc_list = []
     for doc in docs:
         doc_list.append(doc.to_dict())
     point_counter = [nr for nr in range(30, 185, 5)]
     return render_template("leaderboard.html", doc_list=doc_list)
 
-@app.route("/signup")
+@app.route("/signup", methods=['GET', 'POST'])
 def signup():
+    if request.method == 'POST':
+        first_name = request.form.get("first_name")
+        last_name = request.form.get("last_name")
+        username = request.form.get("username")
+
+        # Connect to firebase
+        db = firestore.client()
+
+        user_data = {
+            u'name': first_name,
+            u'last_name': last_name,
+            u'nickname': username}
+
+        # Add a new doc in collection 'user_info' 
+        db.collection(u'user_info').document().set(user_data)
+
     return render_template("signup.html")
 
 @app.route("/add_exercise", methods=['GET', 'POST'])
@@ -63,15 +78,24 @@ def add_exercise():
 
         db = firestore.client()
 
-        data = {
+        exercise_data = {
             u'date': date_value,
             u'name': athlete_name,
             u'activity': activity_name,
             u'length_of_activity': activity_length}
 
-        # Add a new doc in collection 'cities' with ID 'LA'
-        db.collection(u'exercise').document().set(data)
-    return render_template("add_exercise.html", activities=point_system, point_counter=point_counter, today=today)
+        # Add a new doc in collection 'exercise'
+        db.collection(u'exercise').document().set(exercise_data)
+
+    # Connect to firebase client
+    db = firestore.client()
+    users_ref = db.collection(u'user_info')
+    docs = users_ref.stream()
+    user_names = []
+    for doc in docs:
+        user_names.append(doc.to_dict())
+        
+    return render_template("add_exercise.html", activities=point_system, point_counter=point_counter, today=today, user_names=user_names)
 
 @app.route("/stats")
 def stats():

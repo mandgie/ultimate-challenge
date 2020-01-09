@@ -1,43 +1,44 @@
 {% extends "template.html" %}
 {% block content %}
 <div class="container">
-<form method="POST">
-  <div class="form-row">
-    <div class="form-group col-md-3">
-      <label for="inputState">Datum</label>
-      <input class="form-control" type="date" value="{{ today }}" id="inputState" name="date_value">
+  <form method="POST">
+    <div class="form-row">
+      <div class="form-group col-md-3">
+        <label for="inputState">Datum</label>
+        <input class="form-control" type="date" value="{{ today }}" id="inputState" name="date_value">
+      </div>
+      <div class="form-group col-md-3">
+        <label for="inputState">Deltagare</label>
+        <select id="inputState" class="form-control" name="athlete_name">
+          <option selected>Select</option>
+          {% for item in user_names %}
+          <option>{{ item['name'] }} {{ item['last_name'] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group col-md-3">
+        <label for="inputState">Aktivitet</label>
+        <select id="inputState" class="form-control" name="activity_name">
+          <option selected>Select</option>
+          {% for item in activities %}
+          <option>{{ item }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group col-md-3">
+        <label for="inputState">Aktivitetens Längd</label>
+        <select id="inputState" class="form-control" name="activity_length">
+          <option selected>Select</option>
+          {% for length in point_counter %}
+          <option>{{ length }}</option>
+          {% endfor %}
+        </select>
+      </div>
     </div>
-    <div class="form-group col-md-3">
-      <label for="inputState">Deltagare</label>
-      <select id="inputState" class="form-control" name="athlete_name">
-        <option selected>Select</option>
-        <option>Andre Dyrenäs</option>
-        <option>Carl Adelstrand</option>
-      </select>
-    </div>
-    <div class="form-group col-md-3">
-      <label for="inputState">Aktivitet</label>
-      <select id="inputState" class="form-control" name="activity_name">
-        <option selected>Select</option>
-        {% for item in activities %}
-        <option>{{ item }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="form-group col-md-3">
-      <label for="inputState">Aktivitetens Längd</label>
-      <select id="inputState" class="form-control" name="activity_length">
-        <option selected>Select</option>
-        {% for length in point_counter %}
-        <option>{{ length }}</option>
-        {% endfor %}
-      </select>
-    </div>
-  </div>
-    <div class="mx-auto text-center">
-      <button class="btn btn-primary btn-lg btn-block" type="submit">Registrera</button>
-    </div>
-</form>
+      <div class="mx-auto text-center">
+        <button class="btn btn-primary btn-lg btn-block" type="submit">Registrera</button>
+      </div>
+  </form>
 </div>
 
 {% endblock %}
