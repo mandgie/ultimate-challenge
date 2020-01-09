@@ -42,11 +42,19 @@ def leaderboard():
     db = firestore.client()
     users_ref = db.collection(u'exercise')
     docs = users_ref.stream()
-    doc_list = []
+    result = {}
     for doc in docs:
-        doc_list.append(doc.to_dict())
+        name = doc.to_dict()['name']
+        length_of_activity = doc.to_dict()['length_of_activity']
+        if name not in result:
+            result[name] = [0, 0]
+        result[name][0] += 1
+        result[name][1] += int(length_of_activity)
+
+    result = {k: v for k, v in sorted(result.items(), key=lambda item: item[1][1], reverse=True)}
+
     point_counter = [nr for nr in range(30, 185, 5)]
-    return render_template("leaderboard.html", doc_list=doc_list)
+    return render_template("leaderboard.html", result=result)
 
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
@@ -75,6 +83,10 @@ def add_exercise():
         athlete_name = request.form.get("athlete_name")
         activity_name = request.form.get("activity_name")
         activity_length = request.form.get("activity_length")
+
+        if 'Select' in [date_value, athlete_name, activity_name, activity_length]:
+            return render_template("add_exercise.html", today=today)
+
 
         db = firestore.client()
 
