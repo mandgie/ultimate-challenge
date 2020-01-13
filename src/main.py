@@ -3,6 +3,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 from datetime import date
+import numpy as np
 
 today = date.today()
 
@@ -46,10 +47,12 @@ def leaderboard():
     for doc in docs:
         name = doc.to_dict()['name']
         length_of_activity = doc.to_dict()['length_of_activity']
+        points = doc.to_dict()['points']
         if name not in result:
-            result[name] = [0, 0]
+            result[name] = [0, 0, 0]
         result[name][0] += 1
         result[name][1] += int(length_of_activity)
+        result[name][2] += round(points, 1)
 
     result = {k: v for k, v in sorted(result.items(), key=lambda item: item[1][1], reverse=True)}
 
@@ -58,6 +61,9 @@ def leaderboard():
 
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
+    """Function for signing up a new athlete."""
+
+    # Check for post method
     if request.method == 'POST':
         first_name = request.form.get("first_name")
         last_name = request.form.get("last_name")
@@ -66,38 +72,18 @@ def signup():
         # Connect to firebase
         db = firestore.client()
 
+        # Add a new doc in collection 'user_info'
         user_data = {
             u'name': first_name,
             u'last_name': last_name,
             u'nickname': username}
-
-        # Add a new doc in collection 'user_info' 
         db.collection(u'user_info').document().set(user_data)
 
+    # Render signup page
     return render_template("signup.html")
 
 @app.route("/add_exercise", methods=['GET', 'POST'])
 def add_exercise():
-    if request.method == 'POST':
-        date_value = request.form.get("date_value")
-        athlete_name = request.form.get("athlete_name")
-        activity_name = request.form.get("activity_name")
-        activity_length = request.form.get("activity_length")
-
-        if 'Select' in [date_value, athlete_name, activity_name, activity_length]:
-            return render_template("add_exercise.html", today=today)
-
-
-        db = firestore.client()
-
-        exercise_data = {
-            u'date': date_value,
-            u'name': athlete_name,
-            u'activity': activity_name,
-            u'length_of_activity': activity_length}
-
-        # Add a new doc in collection 'exercise'
-        db.collection(u'exercise').document().set(exercise_data)
 
     # Connect to firebase client
     db = firestore.client()
@@ -106,6 +92,29 @@ def add_exercise():
     user_names = []
     for doc in docs:
         user_names.append(doc.to_dict())
+
+    # Check if it is a post method    
+    if request.method == 'POST':
+        date_value = request.form.get("date_value")
+        athlete_name = request.form.get("athlete_name")
+        activity_name = request.form.get("activity_name")
+        activity_length = request.form.get("activity_length")
+
+        if 'Select' in [date_value, athlete_name, activity_name, activity_length]:
+            return render_template("add_exercise.html", today=today, user_names=user_names)
+
+        points = np.log(int(activity_length) * point_system[activity_name])
+        db = firestore.client()
+
+        exercise_data = {
+            u'date': date_value,
+            u'name': athlete_name,
+            u'activity': activity_name,
+            u'length_of_activity': activity_length,
+            u'points': points}
+
+        # Add a new doc in collection 'exercise'
+        db.collection(u'exercise').document().set(exercise_data)
         
     return render_template("add_exercise.html", activities=point_system, point_counter=point_counter, today=today, user_names=user_names)
 
