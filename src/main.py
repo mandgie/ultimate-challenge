@@ -27,9 +27,6 @@ point_system = {
     'Yoga': 9.0,
     'Övrigt': 10.0}
 
-point_counter = [nr for nr in range(30, 185, 5)]
-
-
 
 app = Flask(__name__)
 
@@ -41,6 +38,8 @@ def home():
 def leaderboard():
     # Connect to firebase client
     db = firestore.client()
+
+    # Get exercise stats
     users_ref = db.collection(u'exercise')
     docs = users_ref.stream()
     result = {}
@@ -54,9 +53,8 @@ def leaderboard():
         result[name][1] += int(length_of_activity)
         result[name][2] += round(points, 1)
 
-    result = {k: v for k, v in sorted(result.items(), key=lambda item: item[1][1], reverse=True)}
+    result = {k: v for k, v in sorted(result.items(), key=lambda item: item[1][2], reverse=True)}
 
-    point_counter = [nr for nr in range(30, 185, 5)]
     return render_template("leaderboard.html", result=result)
 
 @app.route("/signup", methods=['GET', 'POST'])
@@ -85,6 +83,9 @@ def signup():
 @app.route("/add_exercise", methods=['GET', 'POST'])
 def add_exercise():
 
+    # Add minutes for point counter
+    point_counter = [nr for nr in range(30, 185, 5)]
+
     # Connect to firebase client
     db = firestore.client()
     users_ref = db.collection(u'user_info')
@@ -100,8 +101,9 @@ def add_exercise():
         activity_name = request.form.get("activity_name")
         activity_length = request.form.get("activity_length")
 
+        # Check if all fields are filled out
         if 'Select' in [date_value, athlete_name, activity_name, activity_length]:
-            return render_template("add_exercise.html", today=today, user_names=user_names)
+            return render_template("add_exercise.html", today=today, user_names=user_names, activities=point_system, point_counter=point_counter)
 
         points = np.log(int(activity_length) * point_system[activity_name])
         db = firestore.client()
@@ -115,12 +117,29 @@ def add_exercise():
 
         # Add a new doc in collection 'exercise'
         db.collection(u'exercise').document().set(exercise_data)
+
+        return render_template("add_exercise.html", success=True, activities=point_system, point_counter=point_counter, today=today, user_names=user_names)
         
     return render_template("add_exercise.html", activities=point_system, point_counter=point_counter, today=today, user_names=user_names)
 
-@app.route("/stats")
+@app.route("/stats", methods=['GET', 'POST'])
 def stats():
-    return render_template("stats.html")
+
+
+    # Add minutes for point counter
+    point_counter = [nr for nr in range(30, 185, 5)]
+
+    # Check if it is a post method    
+    if request.method == 'POST':
+        activity_name = request.form.get("activity_name")
+        activity_length = request.form.get("activity_length")
+
+        # Caluculate points
+        points = np.log(int(activity_length) * point_system[activity_name])
+        return render_template("stats.html", activities=point_system, point_counter=point_counter, points=round(points, 1), activity_name=activity_name, activity_length=activity_length, box=True)
+
+
+    return render_template("stats.html", activities=point_system, point_counter=point_counter, box=False)
 
 
 if __name__ == '__main__':

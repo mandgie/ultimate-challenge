@@ -1,9 +1,43 @@
 {% extends "template.html" %}
 {% block content %}
-<div class="container">
 <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <h1 class="display-4">Poängsystem</h1>
-  <p class="lead">Information om poängsystem släpps den 15 Januari.</p>
+  <h1 class="display-4">Beräkna dina poäng</h1>
+  <p class="lead">All progress takes place outside the comfort zone.</p>
+</div>
+<div class="container">
+  <form method="POST">
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="inputState">Aktivitet</label>
+        <select id="inputState" class="form-control" name="activity_name">
+          <option selected>Select</option>
+          {% for item in activities %}
+          <option>{{ item }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label for="inputState">Aktivitetens Längd</label>
+        <select id="inputState" class="form-control" name="activity_length">
+          <option selected>Select</option>
+          {% for length in point_counter %}
+          <option>{{ length }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+      <div class="mx-auto text-center">
+        <button class="btn btn-primary btn-lg btn-block" type="submit">Beräkna</button>
+      </div>
+  </form>
+  <div class="card text-center">
+  <div class="card-body">
+    <blockquote class="blockquote mb-0">
+    	{% if box %}
+      <p>Att utöva {{ activity_name }} under {{ activity_length }} minuter ger dig: {{ points }} poäng</p>
+    	{% endif %}
+    </blockquote>
+  </div>
 </div>
 </div>
 {% endblock %}
