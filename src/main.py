@@ -5,8 +5,6 @@ from firebase_admin import firestore
 from datetime import date
 import numpy as np
 
-today = date.today()
-
 # Use the application default credentials
 project_id = 'ultimate-challenge'
 cred = credentials.ApplicationDefault()
@@ -29,6 +27,7 @@ point_system = {
 
 
 app = Flask(__name__)
+
 
 @app.route("/")
 def home():
@@ -83,6 +82,9 @@ def signup():
 @app.route("/add_exercise", methods=['GET', 'POST'])
 def add_exercise():
 
+    # Get date function
+    today = date.today()
+
     # Add minutes for point counter
     point_counter = [nr for nr in range(30, 185, 5)]
 
@@ -119,8 +121,8 @@ def add_exercise():
         db.collection(u'exercise').document().set(exercise_data)
 
         return render_template("add_exercise.html", success=True, activities=point_system, point_counter=point_counter, today=today, user_names=user_names)
-        
     return render_template("add_exercise.html", activities=point_system, point_counter=point_counter, today=today, user_names=user_names)
+
 
 @app.route("/stats", methods=['GET', 'POST'])
 def stats():
@@ -129,7 +131,7 @@ def stats():
     # Add minutes for point counter
     point_counter = [nr for nr in range(30, 185, 5)]
 
-    # Check if it is a post method    
+    # Check if it is a post method
     if request.method == 'POST':
         activity_name = request.form.get("activity_name")
         activity_length = request.form.get("activity_length")
