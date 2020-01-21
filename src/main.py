@@ -50,7 +50,11 @@ def leaderboard():
             result[name] = [0, 0, 0]
         result[name][0] += 1
         result[name][1] += int(length_of_activity)
-        result[name][2] += round(points, 1)
+        result[name][2] += points
+
+    for athlete in result:
+        result[athlete][2] = round(result[athlete][2], 1)
+
 
     result = {k: v for k, v in sorted(result.items(), key=lambda item: item[1][2], reverse=True)}
 
