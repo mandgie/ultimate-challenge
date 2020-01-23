@@ -35,6 +35,10 @@ def home():
 
 @app.route("/leaderboard")
 def leaderboard():
+
+    # Get date function
+    today = date.today()
+
     # Connect to firebase client
     db = firestore.client()
 
@@ -47,13 +51,14 @@ def leaderboard():
         length_of_activity = doc.to_dict()['length_of_activity']
         points = doc.to_dict()['points']
         if name not in result:
-            result[name] = [0, 0, 0]
+            result[name] = [0, 0, 0, 0] # Activities, Length, Points, Activities/Day
         result[name][0] += 1
         result[name][1] += int(length_of_activity)
         result[name][2] += points
 
     for athlete in result:
         result[athlete][2] = round(result[athlete][2], 1)
+        result[athlete][3] = result[athlete][0] / (today - date(2020, 1, 14)).days
 
 
     result = {k: v for k, v in sorted(result.items(), key=lambda item: item[1][2], reverse=True)}
@@ -146,6 +151,10 @@ def stats():
 
 
     return render_template("stats.html", activities=point_system, point_counter=point_counter, box=False)
+
+@app.route("/dashboard", methods=['GET', 'POST'])
+def dashboard():
+    return render_template("dashboard.html")
 
 
 if __name__ == '__main__':
